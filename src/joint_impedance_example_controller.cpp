@@ -210,8 +210,8 @@ controller_interface::return_type JointImpedanceExampleController::update(const 
   T = Lambda; // let robot behave with it's own physical inertia (How can we change the physical inertia and what does it mean?)
 
   //Hardcoded goal position as long as we don't have the goal state publisher
-  position_d_target_ = {0.5, -0.2, 0.5};
-  double roll = M_PI, pitch = 0, yaw = sqrt(2);
+  position_d_target_ = {0.5, 0.3, 0.5};
+  double roll = M_PI, pitch = 1.5, yaw = sqrt(2);
 
   orientation_d_target_ = Eigen::AngleAxisd(roll,  Eigen::Vector3d::UnitX())
                         * Eigen::AngleAxisd(pitch, Eigen::Vector3d::UnitY())
@@ -223,6 +223,7 @@ controller_interface::return_type JointImpedanceExampleController::update(const 
     orientation.coeffs() << -orientation.coeffs();
   }
   Eigen::Quaterniond error_quaternion(orientation.inverse() * orientation_d_);
+
   error.tail(3) << error_quaternion.x(), error_quaternion.y(), error_quaternion.z();
   error.tail(3) << -transform.rotation() * error.tail(3);
   I_error += Sm * dt * integrator_weights.cwiseProduct(error);
@@ -243,7 +244,7 @@ controller_interface::return_type JointImpedanceExampleController::update(const 
                     (2.0 * sqrt(nullspace_stiffness_)) * dq_);  // if config control ) false we don't care about the joint position
 
   tau_impedance = jacobian.transpose() * Sm * (F_impedance /*+ F_repulsion + F_potential*/) + jacobian.transpose() * Sf * F_cmd;
-  auto tau_d_placeholder = 0.1*tau_impedance + 0.1*tau_nullspace + 0.1*coriolis; 
+  auto tau_d_placeholder = tau_impedance + tau_nullspace + coriolis; 
   tau_d << tau_d_placeholder;//add nullspace and coriolis components to desired torque
   tau_d << saturateTorqueRate(tau_d, tau_J_d_M);  // Saturate torque rate to avoid discontinuities
 
@@ -272,9 +273,15 @@ controller_interface::return_type JointImpedanceExampleController::update(const 
     // std::cout << orientation.x() << std::endl;
     // std::cout << K << std::endl;
     // std::cout << D << std::endl;
-    std::cout << position_d_ << std::endl;
-    std::cout << orientation_d_ << std::endl;
-    std::cout << tau_d << std::endl;
+    std::cout << "Error position: " << std::endl;
+    std::cout << position-position_d_target_ << std::endl;
+    //std::cout << position_d_ << std::endl;
+    std::cout << "Current orientation: " << std::endl;
+    std::cout << orientation << std::endl;
+    std::cout << "Goal orientation: " << std::endl;
+    std::cout << orientation_d_target_ << std::endl;
+    // std::cout << orientation_d_ << std::endl;
+    // std::cout << tau_d << std::endl;
   }
 
   outcounter++;

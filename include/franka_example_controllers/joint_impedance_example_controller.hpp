@@ -102,7 +102,6 @@ private:
     Eigen::Matrix<double, 7, 1> dq_;
     Eigen::MatrixXd jacobian_transpose_pinv;  
 
-
     //Robot parameters
     const int num_joints = 7;
     const std::string state_interface_name_{"robot_state"};
@@ -121,15 +120,15 @@ private:
     Eigen::Matrix<double, 6, 6> K =  (Eigen::MatrixXd(6,6) << 250,   0,   0,   0,   0,   0,
                                                                 0, 250,   0,   0,   0,   0,
                                                                 0,   0, 250,   0,   0,   0,  // impedance stiffness term
-                                                                0,   0,   0,  80,   0,   0,
-                                                                0,   0,   0,   0,  80,   0,
+                                                                0,   0,   0,  15,   0,   0,
+                                                                0,   0,   0,   0,  15,   0,
                                                                 0,   0,   0,   0,   0,  10).finished();
 
     Eigen::Matrix<double, 6, 6> D =  (Eigen::MatrixXd(6,6) <<  55,   0,   0,   0,   0,   0,
                                                                 0,  55,   0,   0,   0,   0,
                                                                 0,   0,  55,   0,   0,   0,  // impedance damping term
-                                                                0,   0,   0,  18,   0,   0,
-                                                                0,   0,   0,   0,  18,   0,
+                                                                0,   0,   0,   7,   0,   0,
+                                                                0,   0,   0,   0,   7,   0,
                                                                 0,   0,   0,   0,   0,   6).finished();
 
     Eigen::Matrix<double, 6, 6> T = IDENTITY;                                                // impedance inertia term
